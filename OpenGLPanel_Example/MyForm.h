@@ -190,19 +190,6 @@ namespace OpenGLPanel_Example
 		// Set the color buffer
 		glClearColor(0, 0, 0, 0);
 
-
-		/*glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glBegin(GL_TRIANGLES);
-
-		for (int i = 0; i < 9; i++)
-		{
-			glColor3f(1, 1, 1);
-			glVertex2f(vertices[i].x / 2, vertices[i].y / 2);
-		}
-
-		glEnd();*/
-
 		// Use the shader
 		glUseProgram(paramGL->Program);
 
