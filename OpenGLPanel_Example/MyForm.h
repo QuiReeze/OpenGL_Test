@@ -191,7 +191,7 @@ namespace OpenGLPanel_Example
 		glClearColor(0, 0, 0, 0);
 
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		/*glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		glBegin(GL_TRIANGLES);
 
@@ -201,28 +201,28 @@ namespace OpenGLPanel_Example
 			glVertex2f(vertices[i].x / 2, vertices[i].y / 2);
 		}
 
-		glEnd();
+		glEnd();*/
 
-		//// Use the shader
-		//glUseProgram(paramGL->Program);
+		// Use the shader
+		glUseProgram(paramGL->Program);
 
-		//// Enable 'position' attribute and assign data
+		// Enable 'position' attribute and assign data
 
-		//glEnableVertexAttribArray(0);
-		//glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-		//// Enable 'color' attribute and assign data
-		//glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		// Enable 'color' attribute and assign data
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-		//// Draw the triangle
-		//glDrawArrays(GL_TRIANGLES, 0, 9); // Starting from vertex 0, 3 vertices total
+		// Draw the triangle
+		glDrawArrays(GL_TRIANGLES, 0, 9); // Starting from vertex 0, 3 vertices total
 
-		//// Disable vertex attribute arrays
-		//glDisableVertexAttribArray(0);
-		//glDisableVertexAttribArray(1);
+		// Disable vertex attribute arrays
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 	}
 
 	private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e)
