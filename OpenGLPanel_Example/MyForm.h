@@ -74,13 +74,13 @@ namespace OpenGLPanel_Example
 			hkcoglPanelCameraSetting2->Near = -1000;
 			hkcoglPanelCameraSetting2->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
 			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting2;
-			this->hkoglPanelControl1->Location = System::Drawing::Point(12, 12);
+			this->hkoglPanelControl1->Location = System::Drawing::Point(12, 13);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
 			hkcoglPanelPixelFormat2->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			hkcoglPanelPixelFormat2->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			hkcoglPanelPixelFormat2->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
 			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat2;
-			this->hkoglPanelControl1->Size = System::Drawing::Size(360, 337);
+			this->hkoglPanelControl1->Size = System::Drawing::Size(360, 365);
 			this->hkoglPanelControl1->TabIndex = 0;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &MyForm::hkoglPanelControl1_Load);
 			this->hkoglPanelControl1->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MyForm::hkoglPanelControl1_Paint);
@@ -93,9 +93,9 @@ namespace OpenGLPanel_Example
 			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(384, 361);
+			this->ClientSize = System::Drawing::Size(384, 391);
 			this->Controls->Add(this->hkoglPanelControl1);
 			this->Name = L"MyForm";
 			this->Text = L"OpenGL Panel";
@@ -106,6 +106,13 @@ namespace OpenGLPanel_Example
 #pragma endregion
 	private:
 		Vec3f* vertices;
+
+		int angle = 0;
+
+		Vec3f setVertice(float degree, float len)
+		{
+			return { len * cos(degree),len * sin(degree), 0.0f };
+		}
 
 	private: System::Void hkoglPanelControl1_Load(System::Object^ sender, System::EventArgs^ e)
 	{
@@ -133,6 +140,22 @@ namespace OpenGLPanel_Example
 		glGenVertexArrays(1, &paramGL->VAO);
 		glBindVertexArray(paramGL->VAO);
 
+		//Assign 3 vertices for triangles
+		vertices = new Vec3f[9]();
+
+		const float H = 2 * Math::PI / 5, len = cos(H) * (1 / cos(H / 2)); // 0.38f
+
+		vertices[0] = setVertice(Math::PI / 2, 1);
+		vertices[1] = setVertice(1.5 * Math::PI - H / 2, 1);
+		vertices[2] = setVertice(1.5 * Math::PI + H, len);
+
+		vertices[3] = setVertice(Math::PI / 2 - H, 1);
+		vertices[4] = setVertice(Math::PI / 2 + H, 1);
+		vertices[5] = setVertice(1.5 * Math::PI, len);
+
+		vertices[6] = setVertice(1.5 * Math::PI + H / 2, 1);
+		vertices[7] = setVertice(Math::PI / 2, 1);
+		vertices[8] = setVertice(1.5 * Math::PI - H, len);
 
 		// Assign colors for each vertex
 		Vec3f color[9];
@@ -140,36 +163,9 @@ namespace OpenGLPanel_Example
 		for (int i = 0; i < 9; i++)
 			color[i] = { 148, 0, 211 };
 
-		// Assign 3 vertices for a triangle
-		vertices = new Vec3f[9]();
-
-		const float H = 2 * Math::PI / 5, len = cos(H) * (1 / cos(H / 2)); // 0.38f
-		float deg = 0;
-
-		deg = Math::PI / 2;
-		vertices[0] = { cos(deg), sin(deg),  0.0f };
-		deg = 1.5 * Math::PI - H / 2;
-		vertices[1] = { cos(deg), sin(deg), 0.0f };
-		deg = 1.5 * Math::PI + H;
-		vertices[2] = { len * cos(deg), len * sin(deg), 0.0f };
-
-		deg = Math::PI / 2 - H;
-		vertices[3] = { cos(deg), sin(deg),  0.0f };
-		deg = Math::PI / 2 + H;
-		vertices[4] = { cos(deg), sin(deg), 0.0f };
-		deg = 1.5 * Math::PI;
-		vertices[5] = { len * cos(deg), len * sin(deg), 0.0f };
-
-		deg = 1.5 * Math::PI + H / 2;
-		vertices[6] = { cos(deg), sin(deg),  0.0f };
-		deg = Math::PI / 2;
-		vertices[7] = { cos(deg), sin(deg), 0.0f };
-		deg = 1.5 * Math::PI - H;
-		vertices[8] = { len * cos(deg), len * sin(deg), 0.0f };
-
 		glGenBuffers(1, &paramGL->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(Vec3f), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
@@ -188,13 +184,23 @@ namespace OpenGLPanel_Example
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Set the color buffer
-		glClearColor(0, 0, 0, 0);
+		glClearColor(0, 0.5, 0.5, 0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		// Use the shader
 		glUseProgram(paramGL->Program);
 
-		// Enable 'position' attribute and assign data
+		// 2D Rotation
+		float degree = angle * 2 * Math::PI / 360;
+		float rotationMatrix[] = {
+			cos(degree), -sin(degree), 0.0f, 0.0f,
+			sin(degree), cos(degree),  0.0f, 0.0f,
+			0.0f,       0.0f,        1.0f, 0.0f,
+			0.0f,       0.0f,        0.0f, 1.0f
+		};
+		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "rotationMatrix"), 1, GL_FALSE, rotationMatrix);
 
+		// Enable 'position' attribute and assign data
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
@@ -204,8 +210,9 @@ namespace OpenGLPanel_Example
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+
 		// Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 9); // Starting from vertex 0, 3 vertices total
+		glDrawArrays(GL_TRIANGLES, 0, 9);
 
 		// Disable vertex attribute arrays
 		glDisableVertexAttribArray(0);
@@ -214,6 +221,7 @@ namespace OpenGLPanel_Example
 
 	private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e)
 	{
+		angle = (angle + 1) % 360;
 		// Redraw the OpenGL Panel
 		hkoglPanelControl1->Invalidate();
 	}

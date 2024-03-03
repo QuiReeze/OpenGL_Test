@@ -11,6 +11,9 @@ public:
 	// Vertex array object
 	GLuint VAO;
 
+	// Elemant buffer obj
+	GLuint EBO;
+
 	// Vertex buffer object
 	GLuint VBOv;
 
