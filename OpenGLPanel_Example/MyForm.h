@@ -106,6 +106,7 @@ namespace OpenGLPanel_Example
 #pragma endregion
 	private:
 		Vec3f* vertices;
+		unsigned int* indice;
 
 		int angle = 0;
 
@@ -141,35 +142,45 @@ namespace OpenGLPanel_Example
 		glBindVertexArray(paramGL->VAO);
 
 		//Assign 3 vertices for triangles
-		vertices = new Vec3f[9]();
+		int pointAmount = 10;
 
-		const float H = 2 * Math::PI / 5, len = cos(H) * (1 / cos(H / 2)); // 0.38f
+		const float H = 2 * Math::PI / 10, len = cos(2 * H) * (1 / cos(H)); // 0.38f
+		indice = new unsigned int[3 * pointAmount]();
+		vertices = new Vec3f[pointAmount + 1]();
 
-		vertices[0] = setVertice(Math::PI / 2, 1);
-		vertices[1] = setVertice(1.5 * Math::PI - H / 2, 1);
-		vertices[2] = setVertice(1.5 * Math::PI + H, len);
+		vertices[pointAmount] = { 0,0,0 };
+		for (int i = 0; i < pointAmount; i++)
+		{
+			vertices[i] = setVertice(i * H, (i % 2 == 1 ? 1 : len));
+		}
 
-		vertices[3] = setVertice(Math::PI / 2 - H, 1);
-		vertices[4] = setVertice(Math::PI / 2 + H, 1);
-		vertices[5] = setVertice(1.5 * Math::PI, len);
-
-		vertices[6] = setVertice(1.5 * Math::PI + H / 2, 1);
-		vertices[7] = setVertice(Math::PI / 2, 1);
-		vertices[8] = setVertice(1.5 * Math::PI - H, len);
+		for (int i = 0; i < pointAmount; i++)
+		{
+			indice[i * 3] = pointAmount;
+			indice[i * 3 + 1] = i;
+			indice[i * 3 + 2] = (i + 1) % pointAmount;
+		}
 
 		// Assign colors for each vertex
-		Vec3f color[9];
+		Vec3f* color = new Vec3f[pointAmount + 1]();
 
-		for (int i = 0; i < 9; i++)
-			color[i] = { 148, 0, 211 };
+		color[pointAmount] = { 1,1,1 };
+		for (int i = 0; i < pointAmount; i++)
+		{
+			color[i] = { 0,1,1 };
+		}
 
 		glGenBuffers(1, &paramGL->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 11 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(Vec3f), &color[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 11 * sizeof(Vec3f), color, GL_STATIC_DRAW);
+
+		glGenBuffers(1, &paramGL->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 30 * sizeof(unsigned int), indice, GL_STATIC_DRAW);
 
 		// Get and print used OpenGL version
 		int ver[2] = { 0, 0 };
@@ -184,7 +195,7 @@ namespace OpenGLPanel_Example
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Set the color buffer
-		glClearColor(0, 0.5, 0.5, 0);
+		glClearColor(0, 0, 0, 0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		// Use the shader
@@ -212,7 +223,9 @@ namespace OpenGLPanel_Example
 
 
 		// Draw the triangle
-		glDrawArrays(GL_TRIANGLES, 0, 9);
+		glBindVertexArray(paramGL->VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
+		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
 
 		// Disable vertex attribute arrays
 		glDisableVertexAttribArray(0);
