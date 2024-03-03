@@ -172,15 +172,15 @@ namespace OpenGLPanel_Example
 
 		glGenBuffers(1, &paramGL->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, 11 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, 11 * sizeof(Vec3f), color, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), color, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 30 * sizeof(unsigned int), indice, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * pointAmount * sizeof(unsigned int), indice, GL_STATIC_DRAW);
 
 		// Get and print used OpenGL version
 		int ver[2] = { 0, 0 };
