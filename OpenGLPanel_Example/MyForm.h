@@ -61,29 +61,32 @@ namespace OpenGLPanel_Example
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
-			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting2 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
-			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat2 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
+			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
+			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
 			this->SuspendLayout();
 			// 
 			// hkoglPanelControl1
 			// 
-			hkcoglPanelCameraSetting2->Far = 1000;
-			hkcoglPanelCameraSetting2->Fov = 45;
-			hkcoglPanelCameraSetting2->Near = -1000;
-			hkcoglPanelCameraSetting2->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
-			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting2;
-			this->hkoglPanelControl1->Location = System::Drawing::Point(12, 13);
+			hkcoglPanelCameraSetting1->Far = 1000;
+			hkcoglPanelCameraSetting1->Fov = 45;
+			hkcoglPanelCameraSetting1->Near = -1000;
+			hkcoglPanelCameraSetting1->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
+			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting1;
+			this->hkoglPanelControl1->Location = System::Drawing::Point(12, 12);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
-			hkcoglPanelPixelFormat2->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat2;
-			this->hkoglPanelControl1->Size = System::Drawing::Size(360, 365);
+			hkcoglPanelPixelFormat1->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat1;
+			this->hkoglPanelControl1->Size = System::Drawing::Size(360, 337);
 			this->hkoglPanelControl1->TabIndex = 0;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &MyForm::hkoglPanelControl1_Load);
 			this->hkoglPanelControl1->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MyForm::hkoglPanelControl1_Paint);
+			this->hkoglPanelControl1->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &MyForm::MyForm_KeyDown);
+			this->hkoglPanelControl1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseDown);
+			this->hkoglPanelControl1->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseUp);
 			// 
 			// timer1
 			// 
@@ -93,9 +96,9 @@ namespace OpenGLPanel_Example
 			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(384, 391);
+			this->ClientSize = System::Drawing::Size(384, 361);
 			this->Controls->Add(this->hkoglPanelControl1);
 			this->Name = L"MyForm";
 			this->Text = L"OpenGL Panel";
@@ -106,6 +109,9 @@ namespace OpenGLPanel_Example
 #pragma endregion
 	private:
 		Vec3f* vertices;
+		Vec3f* camPos, *lookPos, *mouseKeep;
+		bool isMouseDown;
+		
 		unsigned int* indice;
 
 		int angle = 0;
@@ -136,6 +142,18 @@ namespace OpenGLPanel_Example
 			{ GL_NONE, NULL }
 		};
 		paramGL->Program = LoadShaders(shaders);
+
+
+
+		isMouseDown = 0;
+
+		camPos = new Vec3f();
+		camPos->x = 0;
+		camPos->y = 0;
+		camPos->z = 2;
+
+
+
 
 		// Create and bind VAO
 		glGenVertexArrays(1, &paramGL->VAO);
@@ -198,8 +216,26 @@ namespace OpenGLPanel_Example
 		glClearColor(0, 0, 0, 0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+
+
+		Vec3f temp = { 0,0,0 };
+		if (isMouseDown)
+		{
+			temp = {mouseKeep->x}
+		}
+
+		gluPerspective(60, 1, 1, 10);
+		gluLookAt(
+			camPos->x, camPos->y, camPos->z,
+			0, 0, 0,
+			0, 1, 0
+			);
+
+
+
+
 		// Use the shader
-		glUseProgram(paramGL->Program);
+		//glUseProgram(paramGL->Program);
 
 		// 2D Rotation
 		float degree = angle * 2 * Math::PI / 360;
@@ -225,7 +261,23 @@ namespace OpenGLPanel_Example
 		// Draw the triangle
 		glBindVertexArray(paramGL->VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
+		//glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
+
+
+
+
+		glBegin(GL_TRIANGLES);
+		for (int i = 0; i < 10; i++)
+		{
+			glColor3f(1, 1, 0);
+			glVertex3f(vertices[10].x / 3, vertices[10].y / 3, 0);
+			glVertex3f(vertices[i].x / 3, vertices[i].y / 3, 0);
+			glVertex3f(vertices[(i + 1) % 10].x / 3, vertices[(i + 1) % 10].y / 3, 0);
+		}
+		glEnd();
+
+
+
 
 		// Disable vertex attribute arrays
 		glDisableVertexAttribArray(0);
@@ -241,5 +293,34 @@ namespace OpenGLPanel_Example
 
 	private:
 		ParamGL* paramGL = NULL;
-	};
+	private: System::Void MyForm_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+		float distance = 0.1;
+		//MessageBox::Show("");
+		if (e->KeyCode == Keys::W)
+		{
+			camPos->z -= distance;
+		}
+		if (e->KeyCode == Keys::A)
+		{
+			camPos->x -= distance;
+		}
+		if (e->KeyCode == Keys::S)
+		{
+			camPos->z += distance;
+		}
+		if (e->KeyCode == Keys::D)
+		{
+			camPos->x += distance;
+		}
+	}
+
+private: System::Void hkoglPanelControl1_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		isMouseDown = 1;
+	}
+private: 
+	System::Void hkoglPanelControl1_MouseUp(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		
+		isMouseDown = 0;
+	}
+};
 }
