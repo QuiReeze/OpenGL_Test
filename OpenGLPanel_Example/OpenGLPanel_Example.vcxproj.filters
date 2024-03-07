@@ -16,6 +16,9 @@
     <ClInclude Include="Param.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="moveControl.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header">
