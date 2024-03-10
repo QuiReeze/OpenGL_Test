@@ -166,8 +166,8 @@ namespace OpenGLPanel_Example
 		moveCam = new bool(0);
 
 		// init eye
-		eye = new glm::vec3(0, 0, 2);
-		look = new glm::vec3(0, 0, 0);
+		eye = new glm::vec3(0, 0.5f, 2);
+		look = new glm::vec3(0, 0.5f, 1);
 
 		// Create and bind VAO
 		glGenVertexArrays(1, &paramGL->VAO);
@@ -178,37 +178,37 @@ namespace OpenGLPanel_Example
 
 		const float H = 2 * Math::PI / 10, len = cos(2 * H) * (1 / cos(H)); // 0.38f
 
-		Vec3f* vertices = new Vec3f[pointAmount + 1]();
-		vertices[pointAmount] = { 0,0,0 };
+		Vec3f* vertices1 = new Vec3f[pointAmount + 1]();
+		vertices1[pointAmount] = { 0,0,0 };
 		for (int i = 0; i < pointAmount; i++)
-			vertices[i] = setVertice(i * H, (i % 2 == 1 ? 1 : len));
+			vertices1[i] = setVertice(i * H, (i % 2 == 1 ? 1 : len));
 
-		unsigned int* indice = new unsigned int[3 * pointAmount]();
+		unsigned int* indice1 = new unsigned int[3 * pointAmount]();
 		for (int i = 0; i < pointAmount; i++)
 		{
-			indice[i * 3] = pointAmount;
-			indice[i * 3 + 1] = i;
-			indice[i * 3 + 2] = (i + 1) % pointAmount;
+			indice1[i * 3] = pointAmount;
+			indice1[i * 3 + 1] = i;
+			indice1[i * 3 + 2] = (i + 1) % pointAmount;
 		}
 
 		// Assign colors for each vertex
-		Vec3f* color = new Vec3f[pointAmount + 1]();
+		Vec3f* color1 = new Vec3f[pointAmount + 1]();
 
-		color[pointAmount] = { 1,1,1 };
+		color1[pointAmount] = { 1,1,1 };
 		for (int i = 0; i < pointAmount; i++)
-			color[i] = { 0,1,1 };
+			color1[i] = { 0,1,1 };
 
 		glGenBuffers(1, &paramGL->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), vertices1, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), color, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), color1, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &paramGL->EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * pointAmount * sizeof(unsigned int), indice, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * pointAmount * sizeof(unsigned int), indice1, GL_STATIC_DRAW);
 
 
 		// set up worldPlane
@@ -216,32 +216,29 @@ namespace OpenGLPanel_Example
 		glGenVertexArrays(1, &worldPlane->VAO);
 		glBindVertexArray(worldPlane->VAO);
 
-		delete vertices;
-		vertices = new Vec3f[4]();
-		vertices[0] = { -1,	-1,	-1 };
-		vertices[1] = { 1,	-1,	-1 };
-		vertices[2] = { 1,	-1,	1 };
-		vertices[3] = { -1,	-1,	1 };
+		Vec3f* vertices2 = new Vec3f[4]();
+		vertices2[0] = { -100, 0,	-100 };
+		vertices2[1] = { 100,	0,	-100 };
+		vertices2[2] = { 100,	0,	100 };
+		vertices2[3] = { -100, 0,	100 };
 
-		delete color;
-		color = new Vec3f[4]();
+		Vec3f* color2 = new Vec3f[4]();
 		for (int i = 0; i < 4; i++)
-			color[i] = { 0.5f,0.5f,0.5f };
+			color2[i] = { 0.5f,0.5f,0.5f };
 
-		delete indice;
-		indice = new unsigned int[12]{ 2, 1, 0, 3, 2, 0, 0, 1, 2, 0, 2, 3 };
+		unsigned int* indice2 = new unsigned int[12]{ 2, 1, 0, 3, 2, 0, 0, 1, 2, 0, 2, 3 };
 
 		glGenBuffers(1, &worldPlane->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, worldPlane->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), vertices2, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &worldPlane->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, worldPlane->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), color, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), color2, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &worldPlane->EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldPlane->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indice, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indice2, GL_STATIC_DRAW);
 
 		// Get and print used OpenGL version
 		int ver[2] = { 0, 0 };
@@ -258,6 +255,7 @@ namespace OpenGLPanel_Example
 		// Set the color buffer
 		glClearColor(0, 0, 0, 0);
 		glPolygonMode(GL_DOUBLE, GL_FILL);
+		glEnable(GL_DEPTH_TEST);
 
 		// Use the shader
 		glUseProgram(paramGL->Program);
@@ -270,34 +268,40 @@ namespace OpenGLPanel_Example
 		*look = *eye + glm::vec3(lookVec.x, lookVec.y, lookVec.z);
 
 		// Set matrix
-		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 0, -1));
-		glm::mat4 move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-		glm::mat4 view = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
-		glm::mat4 project = glm::perspective(glm::radians(45.0f), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 100.0f);
+		glm::mat4 rotation1 = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 0, -1));
+		glm::mat4 move1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5f, 0));
+		glm::mat4 view1 = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
+		glm::mat4 project1 = glm::perspective(glm::radians(45.0f), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 100.0f);
 
-		//// draw star
+		// draw star
 
-		//// put matrix
-		//glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation));
-		//glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move));
-		//glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project));
+		// put matrix
+		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation1));
+		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move1));
+		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view1));
+		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project1));
 
-		//// Enable 'position' attribute and assign data
-		//glEnableVertexAttribArray(0);
-		//glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		// Enable 'position' attribute and assign data
+		glEnableVertexAttribArray(0);
+		//glGenBuffers(1, &paramGL->VBOv);
+		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-		//// Enable 'color' attribute and assign data
-		//glEnableVertexAttribArray(1);
-		//glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+		// Enable 'color' attribute and assign data
+		glEnableVertexAttribArray(1);
+		//glGenBuffers(1, &paramGL->VBOc);
+		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 
-		//// Draw the triangle
-		//glBindVertexArray(paramGL->VAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		//glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
+		// Draw the triangle
+		//glGenVertexArrays(1, &paramGL->VAO);
+		glBindVertexArray(paramGL->VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
+		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 
 
 
@@ -305,13 +309,16 @@ namespace OpenGLPanel_Example
 
 		glUseProgram(worldPlane->Program);
 
-		rotation = glm::mat4(1.0f);
-		move = glm::mat4(1.0f);
+		// Set matrix
+		glm::mat4 rotation2 = glm::mat4(1.0f);
+		glm::mat4 move2 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		glm::mat4 view2 = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
+		glm::mat4 project2 = glm::perspective(glm::radians(45.0f), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 100.0f);
 
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation2));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move2));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view1));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project1));
 
 		// Enable 'position' attribute and assign data
 		glEnableVertexAttribArray(0);
@@ -325,11 +332,11 @@ namespace OpenGLPanel_Example
 
 
 		// Draw the triangle
-		glBindVertexArray(worldPlane->VAO);
+		//glBindVertexArray(worldPlane->VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldPlane->EBO);
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
-
+		glDisable(GL_DEPTH_TEST);
 		// Disable vertex attribute arrays
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
@@ -351,9 +358,9 @@ namespace OpenGLPanel_Example
 			keyGet = &(keyEn->left);
 		if (e->KeyCode == Keys::D)
 			keyGet = &(keyEn->right);
-		if (e->KeyCode == Keys::C)
+		if (e->KeyCode == Keys::Q)
 			keyGet = &(keyEn->down);
-		if (e->KeyCode == Keys::V)
+		if (e->KeyCode == Keys::E)
 			keyGet = &(keyEn->up);
 
 		if (e->KeyCode == Keys::I)
@@ -379,9 +386,9 @@ namespace OpenGLPanel_Example
 			keyGet = &(keyEn->left);
 		if (e->KeyCode == Keys::D)
 			keyGet = &(keyEn->right);
-		if (e->KeyCode == Keys::C)
+		if (e->KeyCode == Keys::Q)
 			keyGet = &(keyEn->down);
-		if (e->KeyCode == Keys::V)
+		if (e->KeyCode == Keys::E)
 			keyGet = &(keyEn->up);
 
 		if (e->KeyCode == Keys::I)
