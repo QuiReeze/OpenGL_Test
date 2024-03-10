@@ -5,6 +5,9 @@
 #include <vector>
 #include <string>
 #include <windows.h>
+#include <algorithm>
+#include <bitset>
+#include <vector>
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
@@ -67,8 +70,8 @@ namespace OpenGLPanel_Example
 		void InitializeComponent(void)
 		{
 			this->components = (gcnew System::ComponentModel::Container());
-			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting2 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
-			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat2 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
+			HKOGLPanel::HKCOGLPanelCameraSetting^ hkcoglPanelCameraSetting1 = (gcnew HKOGLPanel::HKCOGLPanelCameraSetting());
+			HKOGLPanel::HKCOGLPanelPixelFormat^ hkcoglPanelPixelFormat1 = (gcnew HKOGLPanel::HKCOGLPanelPixelFormat());
 			this->hkoglPanelControl1 = (gcnew HKOGLPanel::HKOGLPanelControl());
 			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
 			this->moveControl = (gcnew System::Windows::Forms::Timer(this->components));
@@ -76,19 +79,20 @@ namespace OpenGLPanel_Example
 			// 
 			// hkoglPanelControl1
 			// 
-			hkcoglPanelCameraSetting2->Far = 1000;
-			hkcoglPanelCameraSetting2->Fov = 45;
-			hkcoglPanelCameraSetting2->Near = -1000;
-			hkcoglPanelCameraSetting2->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
-			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting2;
-			this->hkoglPanelControl1->Location = System::Drawing::Point(16, 16);
-			this->hkoglPanelControl1->Margin = System::Windows::Forms::Padding(4);
+			hkcoglPanelCameraSetting1->Far = 1000;
+			hkcoglPanelCameraSetting1->Fov = 45;
+			hkcoglPanelCameraSetting1->Near = -1000;
+			hkcoglPanelCameraSetting1->Type = HKOGLPanel::HKCOGLPanelCameraSetting::CAMERATYPE::ORTHOGRAPHIC;
+			this->hkoglPanelControl1->Camera_Setting = hkcoglPanelCameraSetting1;
+			this->hkoglPanelControl1->Cursor = System::Windows::Forms::Cursors::Default;
+			this->hkoglPanelControl1->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->hkoglPanelControl1->Location = System::Drawing::Point(0, 0);
 			this->hkoglPanelControl1->Name = L"hkoglPanelControl1";
-			hkcoglPanelPixelFormat2->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			hkcoglPanelPixelFormat2->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
-			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat2;
-			this->hkoglPanelControl1->Size = System::Drawing::Size(800, 800);
+			hkcoglPanelPixelFormat1->Accumu_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Alpha_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			hkcoglPanelPixelFormat1->Stencil_Buffer_Bits = HKOGLPanel::HKCOGLPanelPixelFormat::PIXELBITS::BITS_0;
+			this->hkoglPanelControl1->Pixel_Format = hkcoglPanelPixelFormat1;
+			this->hkoglPanelControl1->Size = System::Drawing::Size(1396, 675);
 			this->hkoglPanelControl1->TabIndex = 0;
 			this->hkoglPanelControl1->Load += gcnew System::EventHandler(this, &MyForm::hkoglPanelControl1_Load);
 			this->hkoglPanelControl1->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MyForm::hkoglPanelControl1_Paint);
@@ -97,6 +101,7 @@ namespace OpenGLPanel_Example
 			this->hkoglPanelControl1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseDown);
 			this->hkoglPanelControl1->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseMove);
 			this->hkoglPanelControl1->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseUp);
+			this->hkoglPanelControl1->MouseWheel += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::hkoglPanelControl1_MouseWheel);
 			// 
 			// timer1
 			// 
@@ -112,11 +117,10 @@ namespace OpenGLPanel_Example
 			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(834, 831);
+			this->ClientSize = System::Drawing::Size(1396, 675);
 			this->Controls->Add(this->hkoglPanelControl1);
-			this->Margin = System::Windows::Forms::Padding(4);
 			this->Name = L"MyForm";
 			this->Text = L"OpenGL Panel";
 			this->ResumeLayout(false);
@@ -126,13 +130,16 @@ namespace OpenGLPanel_Example
 #pragma endregion
 	private:
 		glm::vec3* eye, * look;
-		float yzDegree = 0, xzDegree = 0, objAngle = 0;
+		float yzDegree = 0, xzDegree = 0, objAngle = 0, fovy = 45;
+		ParamGL* star = NULL;
+		ParamGL* worldPlane = NULL;
+		ParamGL* block = NULL;
 
 		glm::vec2* mouseClickPos;
 
 		Vec3f setVertice(float degree, float len)
 		{
-			return { len * cos(degree),len * sin(degree), 0.0f };
+			return { len * cos(degree), len * sin(degree), 0.0f };
 		}
 
 	private: System::Void hkoglPanelControl1_Load(System::Object^ sender, System::EventArgs^ e)
@@ -146,8 +153,16 @@ namespace OpenGLPanel_Example
 		}
 
 		// Create native parameters
-		paramGL = new ParamGL();
+		star = new ParamGL();
 		worldPlane = new ParamGL();
+		block = new ParamGL();
+		mouseMoveDelta = new glm::vec2(0, 0);
+		mouseClickPos = new glm::vec2(0, 0);
+		keyEn = new keyEnable();
+		moveCam = new bool(0);
+		// init eye
+		eye = new glm::vec3(0, 0.5, 2);
+		look = new glm::vec3(0, 0, 0);
 
 		// Load shader from files
 		ShaderInfo shaders[] =
@@ -156,59 +171,61 @@ namespace OpenGLPanel_Example
 			{ GL_FRAGMENT_SHADER, "../Shader/shader.fs" },
 			{ GL_NONE, NULL }
 		};
-		paramGL->Program = LoadShaders(shaders);
+		star->Program = LoadShaders(shaders);
 		worldPlane->Program = LoadShaders(shaders);
+		block->Program = LoadShaders(shaders);
 
-		// init some data
-		mouseMoveDelta = new glm::vec2(0, 0);
-		mouseClickPos = new glm::vec2(0, 0);
-		keyEn = new keyEnable();
-		moveCam = new bool(0);
-
-		// init eye
-		eye = new glm::vec3(0, 0.5f, 2);
-		look = new glm::vec3(0, 0.5f, 1);
-
-		// Create and bind VAO
-		glGenVertexArrays(1, &paramGL->VAO);
-		glBindVertexArray(paramGL->VAO);
+		// Create and bind VAO star
+		glGenVertexArrays(1, &star->VAO);
+		glBindVertexArray(star->VAO);
 
 		// Assign vertices and index for triangles
 		int pointAmount = 10;
-
 		const float H = 2 * Math::PI / 10, len = cos(2 * H) * (1 / cos(H)); // 0.38f
 
-		Vec3f* vertices1 = new Vec3f[pointAmount + 1]();
-		vertices1[pointAmount] = { 0,0,0 };
+		// set vertice into VBO
+		Vec3f* vertices = new Vec3f[pointAmount + 2]();
+		vertices[pointAmount] = { 0,0,0.1f };
+		vertices[pointAmount + 1] = { 0,0,-0.1f };
 		for (int i = 0; i < pointAmount; i++)
-			vertices1[i] = setVertice(i * H, (i % 2 == 1 ? 1 : len));
+			vertices[i] = setVertice(i * H, (i % 2 == 1 ? 1 : len));
 
-		unsigned int* indice1 = new unsigned int[3 * pointAmount]();
+		// set index into EBO
+		unsigned int* indice = new unsigned int[2 * 3 * pointAmount]();
 		for (int i = 0; i < pointAmount; i++)
 		{
-			indice1[i * 3] = pointAmount;
-			indice1[i * 3 + 1] = i;
-			indice1[i * 3 + 2] = (i + 1) % pointAmount;
+			indice[i * 3] = pointAmount;
+			indice[i * 3 + 1] = i;
+			indice[i * 3 + 2] = (i + 1) % pointAmount;
+
+			indice[(3 * pointAmount) + i * 3] = pointAmount + 1;
+			indice[(3 * pointAmount) + i * 3 + 1] = (i + 1) % pointAmount;
+			indice[(3 * pointAmount) + i * 3 + 2] = i;
 		}
 
 		// Assign colors for each vertex
-		Vec3f* color1 = new Vec3f[pointAmount + 1]();
-
-		color1[pointAmount] = { 1,1,1 };
+		Vec3f* color = new Vec3f[pointAmount + 1]();
+		color[pointAmount] = { 0.7f,0.7f,0.7f };
+		color[pointAmount + 1] = { 0.7f,0.7f,0.7f };
 		for (int i = 0; i < pointAmount; i++)
-			color1[i] = { 0,1,1 };
+			color[i] = { 0,0.7f,0.7f };
 
-		glGenBuffers(1, &paramGL->VBOv);
-		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), vertices1, GL_STATIC_DRAW);
+		glGenBuffers(1, &star->VBOv);
+		glBindBuffer(GL_ARRAY_BUFFER, star->VBOv);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 2) * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
 
-		glGenBuffers(1, &paramGL->VBOc);
-		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 1) * sizeof(Vec3f), color1, GL_STATIC_DRAW);
+		glGenBuffers(1, &star->VBOc);
+		glBindBuffer(GL_ARRAY_BUFFER, star->VBOc);
+		glBufferData(GL_ARRAY_BUFFER, (pointAmount + 2) * sizeof(Vec3f), color, GL_STATIC_DRAW);
 
-		glGenBuffers(1, &paramGL->EBO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * pointAmount * sizeof(unsigned int), indice1, GL_STATIC_DRAW);
+		glGenBuffers(1, &star->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star->EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2 * 3 * pointAmount * sizeof(unsigned int), indice, GL_STATIC_DRAW);
+
+		// clear data
+		delete vertices;
+		delete color;
+		delete indice;
 
 
 		// set up worldPlane
@@ -216,29 +233,79 @@ namespace OpenGLPanel_Example
 		glGenVertexArrays(1, &worldPlane->VAO);
 		glBindVertexArray(worldPlane->VAO);
 
-		Vec3f* vertices2 = new Vec3f[4]();
-		vertices2[0] = { -100, 0,	-100 };
-		vertices2[1] = { 100,	0,	-100 };
-		vertices2[2] = { 100,	0,	100 };
-		vertices2[3] = { -100, 0,	100 };
+		vertices = new Vec3f[4]();
+		vertices[0] = { -100,	0,	-100 };
+		vertices[1] = { 100,	0,	-100 };
+		vertices[2] = { 100,	0,	100 };
+		vertices[3] = { -100,	0,	100 };
 
-		Vec3f* color2 = new Vec3f[4]();
+		color = new Vec3f[4]();
 		for (int i = 0; i < 4; i++)
-			color2[i] = { 0.5f,0.5f,0.5f };
+			color[i] = { 0.5f,0.5f,0.5f };
 
-		unsigned int* indice2 = new unsigned int[12]{ 2, 1, 0, 3, 2, 0, 0, 1, 2, 0, 2, 3 };
+		indice = new unsigned int[12]{ 2, 1, 0, 3, 2, 0, 0, 1, 2, 0, 2, 3 };
 
 		glGenBuffers(1, &worldPlane->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, worldPlane->VBOv);
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), vertices2, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &worldPlane->VBOc);
 		glBindBuffer(GL_ARRAY_BUFFER, worldPlane->VBOc);
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), color2, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vec3f), color, GL_STATIC_DRAW);
 
 		glGenBuffers(1, &worldPlane->EBO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldPlane->EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indice2, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indice, GL_STATIC_DRAW);
+
+
+
+		// set up worldPlane
+
+		glGenVertexArrays(1, &block->VAO);
+		glBindVertexArray(block->VAO);
+
+		pointAmount = 8;
+		vertices = new Vec3f[pointAmount]();
+		for (int i = 0; i < pointAmount; i++)
+		{
+			string bin = std::bitset<3>(i).to_string();
+			vertices[i] = { 0.2,0.2,0.1 };
+			vertices[i].x *= (bin[0] == '0' ? -1 : 1);
+			vertices[i].y *= (bin[1] == '0' ? -1 : 1);
+			vertices[i].z *= (bin[2] == '0' ? -1 : 1);
+			cout << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << endl;
+		}
+
+		color = new Vec3f[pointAmount]();
+		for (int i = 0; i < pointAmount; i++)
+			color[i] = { 0,0.2f,0 };
+
+		indice = new unsigned int[36]{
+			0,1,2,
+			3,2,1,
+			6,5,4,
+			5,6,7,
+			5,3,1,
+			3,5,7,
+			0,2,4,
+			6,4,2,
+			2,3,6,
+			7,6,3,
+			1,0,4,
+			4,5,1
+		};
+
+		glGenBuffers(1, &block->VBOv);
+		glBindBuffer(GL_ARRAY_BUFFER, block->VBOv);
+		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vec3f), vertices, GL_STATIC_DRAW);
+
+		glGenBuffers(1, &block->VBOc);
+		glBindBuffer(GL_ARRAY_BUFFER, block->VBOc);
+		glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(Vec3f), color, GL_STATIC_DRAW);
+
+		glGenBuffers(1, &block->EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), indice, GL_STATIC_DRAW);
 
 		// Get and print used OpenGL version
 		int ver[2] = { 0, 0 };
@@ -253,72 +320,67 @@ namespace OpenGLPanel_Example
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Set the color buffer
-		glClearColor(0, 0, 0, 0);
+		glClearColor(173.0f / 255, 216.0f / 255, 230.0f / 255, 0);
 		glPolygonMode(GL_DOUBLE, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
 
-		// Use the shader
-		glUseProgram(paramGL->Program);
-
-
-		glm::vec4 lookVec =
-			glm::rotate(glm::mat4(1.0f), glm::radians(yzDegree - mouseMoveDelta->y), glm::vec3(-1, 0, 0)) *
-			glm::rotate(glm::mat4(1.0f), glm::radians(xzDegree + mouseMoveDelta->x), glm::vec3(0, 1, 0)) *
+		// Set up look degree
+		float yzTemp = yzDegree - mouseMoveDelta->y, xzTemp = xzDegree + mouseMoveDelta->x;
+		glm::vec3 vecXZ, lookVec;
+		vecXZ =
+			glm::rotate(glm::mat4(1.0f), glm::radians(xzTemp), glm::vec3(0, 1, 0)) *
 			glm::vec4(0.0f, 0.0f, -1.0f, 0.0f);
+		lookVec =
+			glm::rotate(glm::mat4(1.0f), glm::radians(yzTemp), glm::cross(glm::vec3(0, 1, 0), vecXZ)) * glm::vec4(vecXZ, 0);
 		*look = *eye + glm::vec3(lookVec.x, lookVec.y, lookVec.z);
 
 		// Set matrix
-		glm::mat4 rotation1 = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 0, -1));
-		glm::mat4 move1 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5f, 0));
-		glm::mat4 view1 = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
-		glm::mat4 project1 = glm::perspective(glm::radians(45.0f), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 100.0f);
+		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 0, -1));
+		glm::mat4 move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5f, 0));
+		glm::mat4 view = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
+		glm::mat4 project = glm::perspective(glm::radians(fovy), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 10.0f);
+
+
 
 		// draw star
+		// Use the shader
+		glUseProgram(star->Program);
 
 		// put matrix
-		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation1));
-		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move1));
-		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view1));
-		glUniformMatrix4fv(glGetUniformLocation(paramGL->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project1));
+		glUniformMatrix4fv(glGetUniformLocation(star->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation));
+		glUniformMatrix4fv(glGetUniformLocation(star->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move));
+		glUniformMatrix4fv(glGetUniformLocation(star->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(star->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project));
 
 		// Enable 'position' attribute and assign data
 		glEnableVertexAttribArray(0);
-		//glGenBuffers(1, &paramGL->VBOv);
-		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOv);
+		glBindBuffer(GL_ARRAY_BUFFER, star->VBOv);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 		// Enable 'color' attribute and assign data
 		glEnableVertexAttribArray(1);
-		//glGenBuffers(1, &paramGL->VBOc);
-		glBindBuffer(GL_ARRAY_BUFFER, paramGL->VBOc);
+		glBindBuffer(GL_ARRAY_BUFFER, star->VBOc);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
 
 		// Draw the triangle
 		//glGenVertexArrays(1, &paramGL->VAO);
-		glBindVertexArray(paramGL->VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, paramGL->EBO);
-		glDrawElements(GL_TRIANGLES, 30, GL_UNSIGNED_INT, 0);
-
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
+		glBindVertexArray(star->VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, star->EBO);
+		glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_INT, 0);
 
 
-
-		// draw plane
-
-		glUseProgram(worldPlane->Program);
 
 		// Set matrix
-		glm::mat4 rotation2 = glm::mat4(1.0f);
-		glm::mat4 move2 = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-		glm::mat4 view2 = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
-		glm::mat4 project2 = glm::perspective(glm::radians(45.0f), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 100.0f);
+		rotation = glm::mat4(1.0f);
+		move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation2));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move2));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view1));
-		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project1));
+		// draw plane
+		glUseProgram(worldPlane->Program);
+
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(worldPlane->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project));
 
 		// Enable 'position' attribute and assign data
 		glEnableVertexAttribArray(0);
@@ -330,21 +392,47 @@ namespace OpenGLPanel_Example
 		glBindBuffer(GL_ARRAY_BUFFER, worldPlane->VBOc);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-
 		// Draw the triangle
 		//glBindVertexArray(worldPlane->VAO);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, worldPlane->EBO);
 		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
-		glDisable(GL_DEPTH_TEST);
+
+
+		// Set matrix
+		rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 1, 1));
+		move = glm::translate(glm::mat4(1.0f), glm::vec3(1, 0.5, 0));
+
+		// draw block
+		glUseProgram(block->Program);
+
+		glUniformMatrix4fv(glGetUniformLocation(block->Program, "rotationMatrix"), 1, GL_FALSE, glm::value_ptr(rotation));
+		glUniformMatrix4fv(glGetUniformLocation(block->Program, "moveMatrix"), 1, GL_FALSE, glm::value_ptr(move));
+		glUniformMatrix4fv(glGetUniformLocation(block->Program, "lookMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(block->Program, "projectMatrix"), 1, GL_FALSE, glm::value_ptr(project));
+
+		// Enable 'position' attribute and assign data
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, block->VBOv);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		// Enable 'color' attribute and assign data
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, block->VBOc);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+		// Draw the triangle
+		//glBindVertexArray(block->VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->EBO);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
 		// Disable vertex attribute arrays
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
+		glDisable(GL_DEPTH_TEST);
 	}
 
 	private:
-		ParamGL* paramGL = NULL;
-		ParamGL* worldPlane = NULL;
 		keyEnable* keyEn;
 
 	private: System::Void hkoglPanelControl1_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e)
@@ -446,6 +534,12 @@ namespace OpenGLPanel_Example
 		glm::vec2* mouseMoveDelta;
 		bool* moveCam;
 
+	private: System::Void hkoglPanelControl1_MouseWheel(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e)
+	{
+		if (fovy - e->Delta / 50 < 0 || fovy - e->Delta / 50 > 90)
+			return;
+		fovy -= e->Delta / 50;
+	}
 	private: System::Void hkoglPanelControl1_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e)
 	{
 		*moveCam = 1;
@@ -463,7 +557,7 @@ namespace OpenGLPanel_Example
 		if (*moveCam)
 		{
 			glm::vec2 cur = glm::vec2(e->X, e->Y);
-			*mouseMoveDelta = cur - *mouseClickPos;
+			*mouseMoveDelta = (cur - *mouseClickPos) / 5.0f;
 			mouseMoveDelta->x /= 5.0f;
 			mouseMoveDelta->y /= 5.0f;
 		}
