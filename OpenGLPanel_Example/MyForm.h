@@ -269,7 +269,7 @@ namespace OpenGLPanel_Example
 		for (int i = 0; i < pointAmount; i++)
 		{
 			string bin = std::bitset<3>(i).to_string();
-			vertices[i] = { 0.2,0.2,0.1 };
+			vertices[i] = { 0.2,0.2,0.2 };
 			vertices[i].x *= (bin[0] == '0' ? -1 : 1);
 			vertices[i].y *= (bin[1] == '0' ? -1 : 1);
 			vertices[i].z *= (bin[2] == '0' ? -1 : 1);

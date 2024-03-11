@@ -12,6 +12,6 @@ out vec3 ex_Color;
 
 void main()
 {
-	gl_Position =  projectMatrix * lookMatrix * moveMatrix * rotationMatrix * vec4(in_Position.x * 0.5f, in_Position.y * 0.5f, in_Position.z, 1.0);
+	gl_Position =  projectMatrix * lookMatrix * moveMatrix * rotationMatrix * vec4(in_Position.x * 0.5f, in_Position.y * 0.5f, in_Position.z * 0.5f, 1.0);
 	ex_Color = in_Color ;
 }
