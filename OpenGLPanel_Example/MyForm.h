@@ -139,7 +139,7 @@ namespace OpenGLPanel_Example
 
 		Vec3f setVertice(float degree, float len)
 		{
-			return { len * cos(degree), len * sin(degree), 0.0f };
+			return { len * cos(degree), 0.0f, len * sin(degree) };
 		}
 
 	private: System::Void hkoglPanelControl1_Load(System::Object^ sender, System::EventArgs^ e)
@@ -205,10 +205,10 @@ namespace OpenGLPanel_Example
 
 		// Assign colors for each vertex
 		Vec3f* color = new Vec3f[pointAmount + 1]();
-		color[pointAmount] = { 0.7f,0.7f,0.7f };
-		color[pointAmount + 1] = { 0.7f,0.7f,0.7f };
+		color[pointAmount] = { 0.8f,0.8f,0.8f };
+		color[pointAmount + 1] = { 0.8f,0.8f,0.8f };
 		for (int i = 0; i < pointAmount; i++)
-			color[i] = { 0,0.7f,0.7f };
+			color[i] = { 0,0.8f,0.8f };
 
 		glGenBuffers(1, &star->VBOv);
 		glBindBuffer(GL_ARRAY_BUFFER, star->VBOv);
@@ -269,7 +269,7 @@ namespace OpenGLPanel_Example
 		for (int i = 0; i < pointAmount; i++)
 		{
 			string bin = std::bitset<3>(i).to_string();
-			vertices[i] = { 0.2,0.2,0.2 };
+			vertices[i] = { 0.3,0.3,0.3 };
 			vertices[i].x *= (bin[0] == '0' ? -1 : 1);
 			vertices[i].y *= (bin[1] == '0' ? -1 : 1);
 			vertices[i].z *= (bin[2] == '0' ? -1 : 1);
@@ -278,7 +278,7 @@ namespace OpenGLPanel_Example
 
 		color = new Vec3f[pointAmount]();
 		for (int i = 0; i < pointAmount; i++)
-			color[i] = { 0,0.2f,0 };
+			color[i] = { 0.01f,0.01f,0.01f };
 
 		indice = new unsigned int[36]{
 			0,1,2,
@@ -335,8 +335,8 @@ namespace OpenGLPanel_Example
 		*look = *eye + glm::vec3(lookVec.x, lookVec.y, lookVec.z);
 
 		// Set matrix
-		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 0, -1));
-		glm::mat4 move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5f, 0));
+		glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 1, 0));
+		glm::mat4 move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.1f, 0));
 		glm::mat4 view = glm::lookAt(*eye, *look, glm::vec3(0, 1, 0));
 		glm::mat4 project = glm::perspective(glm::radians(fovy), (float)hkoglPanelControl1->Width / hkoglPanelControl1->Height, 0.1f, 10.0f);
 
@@ -401,7 +401,7 @@ namespace OpenGLPanel_Example
 
 		// Set matrix
 		rotation = glm::rotate(glm::mat4(1.0f), glm::radians(objAngle), glm::vec3(0, 1, 1));
-		move = glm::translate(glm::mat4(1.0f), glm::vec3(1, 0.5, 0));
+		move = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5 + sin(glm::radians(objAngle * 1.5)) / 8, 0));
 
 		// draw block
 		glUseProgram(block->Program);
